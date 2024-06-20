@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ucube Site</title>
+    <style>
+        body {
+            background-color: #000;
+            color: #0f0;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+        h1 {
+            font-size: 4em;
+            animation: colorchange 2s infinite;
+        }
+        @keyframes colorchange {
+            0% { color: #f00; }
+            50% { color: #0f0; }
+            100% { color: #00f; }
+        }
+        img {
+            width: 300px;
+            height: auto;
+            border: 5px solid #f00;
+            animation: rotate 5s infinite linear;
+        }
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <h1>Hoş Geldiniz!</h1>
+    <p>Bu, ucube bir web sitesidir.</p>
+    <img src="https://via.placeholder.com/300" alt="Garip Görsel">
+    <p>Absürt ve tuhaf içerikler burada yer alacak.</p>
+</body>
+</html>

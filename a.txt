@@ -1,0 +1,886 @@
+--2
+SELECT e.first_name||' '||e.last_name AS full_name, e.salary,
+       CASE 
+           WHEN e.salary < 3000 THEN 'Low'
+           WHEN e.salary BETWEEN 3000 AND 6000 THEN 'Mid'
+           WHEN e.salary BETWEEN 6001 AND 10000 THEN 'High'
+           ELSE 'Very High'
+       END as salary_level
+FROM employees e
+ORDER BY e.salary;
+
+-- 107 rows selected.
+
+-- 3.
+SELECT 
+    CASE 
+        WHEN salary < 3000 THEN 'Low'
+        WHEN salary BETWEEN 3000 AND 6000 THEN 'Mid'
+        WHEN salary BETWEEN 6001 AND 10000 THEN 'High'
+        ELSE 'Very High'
+    END as salary_level,
+    COUNT(*) as employee_count
+FROM employees
+GROUP BY 
+    CASE 
+        WHEN salary < 3000 THEN 'Low'
+        WHEN salary BETWEEN 3000 AND 6000 THEN 'Mid'
+        WHEN salary BETWEEN 6001 AND 10000 THEN 'High'
+        ELSE 'Very High'
+    END
+ORDER BY 
+    CASE salary_level
+        WHEN 'Low' THEN 1
+        WHEN 'Mid' THEN 2
+        WHEN 'High' THEN 3
+        WHEN 'Very High' THEN 4
+    END;
+
+-- 4 rows selected.
+
+-- 4.
+SELECT e.first_name, e.last_name, e.salary,
+       CASE 
+           WHEN e.salary < 3000 THEN 'Low'
+           WHEN e.salary BETWEEN 3000 AND 6000 THEN 'Mid'
+           WHEN e.salary BETWEEN 6001 AND 10000 THEN 'High'
+           ELSE 'Very High'
+       END as salary_level,
+       j.job_title
+FROM employees e
+JOIN jobs j ON e.job_id = j.job_id
+WHERE e.department_id = 50;
+
+--45 rows selected.
+
+-- 5.
+SELECT e.first_name, e.last_name, 
+       d.department_name, e.salary
+FROM employees e
+LEFT JOIN departments d ON e.department_id = d.department_id
+WHERE e.salary > 6500
+ORDER BY e.salary DESC;
+
+-- 49 rows selected.
+
+-- 6.
+SELECT e.first_name, e.last_name
+FROM employees e
+WHERE e.department_id IS NULL;
+
+-- 1 row selected.
+
+-- 7. 
+SELECT e.first_name, e.last_name, j.job_title
+FROM employees e
+JOIN jobs j ON e.job_id = j.job_id
+WHERE (e.job_id, e.manager_id) IN (
+    SELECT job_id, manager_id
+    FROM employees
+    WHERE employee_id IN (198, 109)
+)
+AND e.salary > 3000;
+--6 rows selected.
+
+-- 8.
+SELECT e.last_name, e.department_id, e.salary
+FROM employees e
+WHERE (e.department_id, e.manager_id) IN (
+    SELECT department_id, manager_id
+    FROM employees
+    WHERE commission_pct IS NULL
+    AND salary > 4000
+);
+
+--34 rows selected.
+
+-- 9.
+SELECT e.last_name, d.department_name, e.salary
+FROM employees e
+JOIN departments d ON e.department_id = d.department_id
+WHERE (e.salary, NVL(e.commission_pct, 0)) IN (
+    SELECT salary, NVL(commission_pct, 0)
+    FROM employees e2
+    JOIN departments d2 ON e2.department_id = d2.department_id
+    WHERE d2.location_id = 1700
+);
+
+-- 36 rows selected.
+
+-- 10. 
+SELECT DISTINCT e1.last_name||' '||e1.first_name AS full_name, e1.department_id
+FROM employees e1
+WHERE EXISTS (
+    SELECT 1
+    FROM employees e2
+    WHERE e1.department_id = e2.department_id
+    AND e2.hire_date > e1.hire_date
+    AND e2.salary > e1.salary
+)
+ORDER BY e1.department_id;
+-- 70 rows selected.
+
+-- 11. 
+SELECT e.last_name||' '||e.first_name AS full_name, e.salary, 
+       d.department_name,
+       ROUND(avg_salary.dept_avg, 2) as department_average
+FROM employees e
+JOIN departments d ON e.department_id = d.department_id
+JOIN (
+    SELECT department_id, AVG(salary) as dept_avg
+    FROM employees
+    GROUP BY department_id
+) avg_salary ON e.department_id = avg_salary.department_id
+WHERE e.salary > avg_salary.dept_avg
+ORDER BY d.department_name;
+--38 rows selected.
+
+-- 12.
+WITH dept_averages AS (
+    SELECT department_id, AVG(salary) as dept_avg
+    FROM employees
+    GROUP BY department_id
+)
+SELECT e.last_name||' '||e.first_name AS full_name, e.salary, 
+       d.department_name,
+       ROUND(da.dept_avg, 2) as department_average
+FROM employees e
+JOIN departments d ON e.department_id = d.department_id
+JOIN dept_averages da ON e.department_id = da.department_id
+WHERE e.salary > da.dept_avg
+ORDER BY d.department_name;
+
+-- 13.
+WITH max_company_salary AS (
+    SELECT MAX(salary) as max_sal
+    FROM employees
+),
+job_max_salaries AS (
+    SELECT j.job_title, MAX(e.salary) as max_job_salary
+    FROM employees e
+    JOIN jobs j ON e.job_id = j.job_id
+    GROUP BY j.job_title
+)
+SELECT job_title
+FROM job_max_salaries, max_company_salary
+WHERE max_job_salary > max_company_salary.max_sal/2
+ORDER BY job_title;
+--6 rows selected.
+
+
+
+-- 14. 
+SELECT d.department_name,
+       (SELECT COUNT(*)
+        FROM employees e
+        WHERE e.department_id = d.department_id) as employee_count,
+       d.location_id
+FROM departments d
+ORDER BY d.department_name;
+--27 rows selected.
+
+
+-- 17. 
+SELECT d.department_name, COUNT(*) as employee_count
+FROM departments d
+JOIN employees e ON d.department_id = e.department_id
+WHERE e.salary > 5000
+GROUP BY d.department_name
+HAVING COUNT(*) > 5
+ORDER BY employee_count DESC;
+-- 2 rows selected.
+
+-- 18. 
+SELECT e.first_name||' '||e.last_name as employee_name,
+       e.salary as employee_salary,
+       m.first_name||' '||m.last_name as manager_name,
+       m.salary as manager_salary
+FROM employees e
+JOIN employees m ON e.manager_id = m.employee_id
+WHERE e.salary > m.salary
+ORDER BY e.salary DESC;
+--2 rows selected.
+
+-- 19. 
+WITH avg_salary AS (
+    SELECT AVG(salary) as avg_sal
+    FROM employees
+)
+SELECT j.job_title, COUNT(*) as employee_count
+FROM employees e
+JOIN jobs j ON e.job_id = j.job_id
+CROSS JOIN avg_salary
+WHERE e.salary > avg_salary.avg_sal
+GROUP BY j.job_title
+HAVING COUNT(*) > 3
+ORDER BY employee_count DESC;
+--4 rows selected.
+
+-- 20.
+SELECT e.first_name||' '||e.last_name as employee_name,
+       e.salary
+FROM employees e
+WHERE e.manager_id IS NULL
+AND e.salary > (SELECT AVG(salary) FROM employees)
+ORDER BY e.salary DESC;
+--1 row selected.
+
+-- 21. 
+WITH ranked_employees AS (
+    SELECT e.first_name||' '||e.last_name as employee_name,
+           d.department_name,
+           e.salary,
+           RANK() OVER (PARTITION BY e.department_id ORDER BY e.salary DESC) as salary_rank
+    FROM employees e
+    JOIN departments d ON e.department_id = d.department_id
+)
+SELECT employee_name, department_name, salary
+FROM ranked_employees
+WHERE salary_rank = 1
+ORDER BY salary DESC;
+
+--11 rows selected.
+
+--LAB exercise 2
+SELECT count(employee_id),SUM(salary),department_id ,job_id
+FROM employees
+GROUP BY department_id, job_id
+UNION ALL
+SELECT count(employee_id),sum(salary),department_id,NULL 
+FROM employees
+GROUP BY department_id
+UNION ALL 
+Select count(employee_id),sum(salary),NULL,NULL 
+FROM employees
+;
+
+
+-- 2. 
+SELECT count(employee_id),SUM(salary),department_id ,job_id
+FROM employees
+GROUP BY GROUPING SETS((department_id,job_id),department_id,());
+
+--3.
+SELECT count(employee_id),SUM(salary),department_id ,job_id
+FROM employees
+GROUP BY CUBE((department_id,job_id),department_id);
+
+
+
+--1.A
+SELECT department_id, SUM(salary), COUNT(employee_id)
+FROM employees
+GROUP BY GROUPING SETS(department_id);
+--12 rows selected.
+SELECT job_id, SUM(salary), COUNT(employee_id)
+FROM employees
+GROUP BY job_id;
+--19 rows selected.
+
+--1.B
+SELECT department_id, SUM(salary), COUNT(employee_id)
+FROM employees
+GROUP BY ROLLUP(department_id);
+--13 rows selected.
+
+--1.C
+SELECT department_id, SUM(salary), COUNT(employee_id)
+FROM employees
+GROUP BY CUBE(department_id);
+--13 rows selected.
+
+--1.D
+SELECT department_id, job_id, SUM(salary), COUNT(employee_id)
+FROM employees
+GROUP BY department_id, job_id;
+--20 rows selected.
+
+--1.E
+SELECT department_id, job_id, SUM(salary), COUNT(employee_id)
+FROM employees
+GROUP BY ROLLUP(department_id, job_id);
+--33 rows selected.
+
+--1.F
+SELECT department_id, job_id, SUM(salary), COUNT(employee_id)
+FROM employees
+GROUP BY CUBE(department_id, job_id);
+--52 rows selected.
+
+--1.G
+SELECT department_id, job_id, SUM(salary), COUNT(employee_id)
+FROM employees
+GROUP BY department_id, ROLLUP(job_id);
+--32 rows selected.
+
+--1.H
+SELECT department_id, job_id, SUM(salary), COUNT(employee_id)
+FROM employees
+GROUP BY department_id, CUBE(job_id);
+--32 rows selected.
+
+--2. Ce se întâmplă dacă la exercițiul precedent subpunctele d,e și f inversați department_id cu job_id?
+-- Daca interschimbam department_id cu job_id, vom obtine aceleasi rezultate ca si in cazul anterior, doar ca in ordine inversa.
+
+-- D
+SELECT job_id, department_id, SUM(salary), COUNT(employee_id)
+FROM employees
+GROUP BY job_id, department_id;
+--20 rows selected.
+
+-- E
+SELECT job_id, department_id, SUM(salary), COUNT(employee_id)
+FROM employees
+GROUP BY ROLLUP(job_id, department_id);
+--40 rows selected.
+
+-- F
+SELECT job_id, department_id, SUM(salary), COUNT(employee_id)
+FROM employees
+GROUP BY CUBE(job_id, department_id);
+--52 rows selected.
+
+-- 3
+-- ROLLUP este un operator care genereaza subtotaluri pentru o lista de coloane, incepand cu cea mai din dreapta coloana si continuand spre stanga. PARTIAL ROLLUP este un operator care genereaza subtotaluri pentru o lista de coloane, incepand cu cea mai din stanga coloana si continuand spre dreapta.
+
+-- FULL ROLLUP
+SELECT department_id, job_id, SUM(salary), COUNT(employee_id)
+FROM employees
+GROUP BY ROLLUP(department_id, job_id);
+--33 rows selected.
+
+-- PARTIAL ROLLUP
+SELECT department_id, job_id, SUM(salary), COUNT(employee_id)
+FROM employees
+GROUP BY department_id, ROLLUP(job_id);
+--32 rows selected.
+
+-- Full ROLLUP
+SELECT department_id, job_id, SUM(salary), COUNT(employee_id)
+FROM employees
+GROUP BY department_id, job_id
+UNION ALL
+SELECT department_id, NULL, SUM(salary), COUNT(employee_id)
+FROM employees
+GROUP BY department_id
+UNION ALL
+SELECT NULL, NULL, SUM(salary), COUNT(employee_id)
+FROM employees;
+--33 rows selected.
+
+-- PARTIAL ROLLUP
+SELECT department_id, job_id, SUM(salary), COUNT(employee_id)
+FROM employees
+GROUP BY department_id, job_id
+UNION ALL
+SELECT department_id, NULL, SUM(salary), COUNT(employee_id)
+FROM employees
+GROUP BY department_id;
+--32 rows selected.
+
+-- 4
+-- CUBE este un operator care genereaza subtotaluri pentru toate combinatiile de coloane, incepand cu o coloana si continuand cu urmatoarea. PARTIAL CUBE este un operator care genereaza subtotaluri pentru toate combinatiile de coloane, incepand cu o coloana si continuand cu urmatoarea, dar nu toate combinatiile posibile.
+
+-- Full CUBE
+SELECT department_id, job_id, SUM(salary), COUNT(employee_id)
+FROM employees
+GROUP BY CUBE(department_id, job_id);
+--52 rows selected.
+
+-- PARTIAL CUBE
+SELECT department_id, job_id, SUM(salary), COUNT(employee_id)
+FROM employees
+GROUP BY department_id, CUBE(job_id);
+--32 rows selected.
+
+-- Full CUBE
+SELECT department_id, job_id, SUM(salary), COUNT(employee_id)
+FROM employees
+GROUP BY department_id, job_id
+UNION ALL
+SELECT department_id, NULL, SUM(salary), COUNT(employee_id)
+FROM employees
+GROUP BY department_id
+UNION ALL
+SELECT NULL, job_id, SUM(salary), COUNT(employee_id)
+FROM employees
+GROUP BY job_id
+UNION ALL
+SELECT NULL, NULL, SUM(salary), COUNT(employee_id)
+FROM employees;
+--52 rows selected.
+
+-- PARTIAL CUBE
+SELECT department_id, job_id, SUM(salary), COUNT(employee_id)
+FROM employees
+GROUP BY department_id, job_id
+UNION ALL
+SELECT department_id, NULL, SUM(salary), COUNT(employee_id)
+FROM employees
+GROUP BY department_id;
+--32 rows selected.
+
+-- 5
+SELECT department_id, job_id, COUNT(*) as total_employees
+FROM employees
+GROUP BY GROUPING SETS (
+    (department_id, job_id),  --a) pentru fiecare departament si tip de job
+    (department_id),          --b) pentru fiecare departament
+    (job_id),                --c) pentru fiecare job
+    ()                       --d) totalul general
+);
+--52 rows selected.
+
+-- 6 
+SELECT c.country_id, l.city, d.department_name,
+       SUM(e.salary + NVL(e.commission_pct, 0) * e.salary) as total_cost
+FROM employees e
+JOIN departments d ON e.department_id = d.department_id
+JOIN locations l ON d.location_id = l.location_id
+JOIN countries c ON l.country_id = c.country_id
+GROUP BY GROUPING SETS (
+    (c.country_name),                                -- a. la nivel de tara
+    (c.country_id, l.city),                        -- b) pentru fiecare tara la nivel de oras
+    (c.country_id, l.city, d.department_name)      -- c) pentru fiecare tara la nivel de oras si de departament
+);
+--22 rows selected.
+
+-- 7 
+SELECT e.manager_id, e.job_id, SUM(e.salary) as total_salary
+FROM employees e
+WHERE e.manager_id < 130
+GROUP BY GROUPING SETS (
+    (e.manager_id, e.job_id),  --a) pentru fiecare manager si tip de job
+    (e.manager_id)             --b) pentru fiecare manager
+);
+--35 rows selected.
+
+-- 8. Rezolvați problema de la punctul 5,6,7 folosind operatorii pe mulțimi potriviți.
+SELECT department_id, job_id, COUNT(employee_id) AS total_employees
+FROM employees
+GROUP BY department_id, job_id
+UNION ALL
+SELECT department_id, NULL AS job_id, COUNT(employee_id) AS total_employees
+FROM employees
+GROUP BY department_id
+UNION ALL
+SELECT NULL AS department_id, job_id, COUNT(employee_id) AS total_employees
+FROM employees
+GROUP BY job_id
+UNION ALL
+SELECT NULL AS department_id, NULL AS job_id, COUNT(employee_id) AS total_employees
+FROM employees;
+-- 1 -- 52 rows selected.
+-- 2 -- 22 rows selected.
+-- 3 -- 35 rows selected.
+
+-- 9
+SELECT department_id, manager_id, job_id, SUM(salary) as total_salary
+FROM employees
+GROUP BY GROUPING SETS (
+    (department_id, manager_id, job_id),  --a) pentru fiecare departament, manager si tip de job
+    (department_id, job_id),              --b) pentru fiecare departament si tip de job
+    (manager_id, job_id)                  --c) pentru fiecare manager si tip de job
+);
+--85 rows selected.
+
+--10
+SELECT department_id, job_id, manager_id, 
+COUNT(employee_id) as total_employees, AVG(salary) as avg_salary
+FROM employees
+GROUP BY GROUPING SETS (
+    (department_id),  --a) pentru fiecare departament
+    (job_id),         --b) pentru fiecare job
+    (manager_id),     --c) pentru fiecare manager
+    ()                --d) totalul general
+);
+--51 rows selected.
+
+
+--1. Scrieți o interogare care să afișeze numărul de angajați, și suma salariilor cu bonificații:
+-- Pentru fiecare departament, pentru fiecare tip de job.
+-- La nivel de departament, indiferent de job.
+-- La nivel de job, indiferent de departament.
+-- Totalul general al angajaților.
+-- În rezultat, valorile NULL rezultate din agregări trebuie înlocuite cu etichete descriptive:
+-- "Toate departamentele" pentru rândurile unde sunt agregate toate departamentele.
+--  "Toate joburile" pentru rândurile unde sunt agregate toate joburile.
+SELECT 
+    DECODE(GROUPING(department_id), 1, 'Toate departamentele', NVL(department_id, 0), 'Fara Departament', department_id) AS department_id,
+    DECODE(GROUPING(job_id), 1, 'Toate joburile', job_id) AS job_id,
+    COUNT(*) AS numar_angajati,
+    SUM(salary + NVL(commission_pct * salary, 0)) AS suma_salariilor
+FROM employees
+GROUP BY CUBE(department_id, job_id)
+ORDER BY 1, 2;
+--52 rows selected. 
+--2. Adăugați la exercițiul 1 nivelul de agregare. Ordonați după acesta ascendent.
+SELECT 
+    DECODE(GROUPING(department_id), 1, 'Toate departamentele',  NVL(department_id, 0), department_id) AS department_id,
+    DECODE(GROUPING(job_id), 1, 'Toate joburile', job_id) AS job_id,
+    COUNT(*) AS numar_angajati,
+    SUM(salary + NVL(commission_pct * salary, 0)) AS suma_salariilor,
+    GROUPING_ID(department_id, job_id) AS nivel_agregare
+FROM employees
+GROUP BY CUBE(department_id, job_id)
+ORDER BY nivel_agregare;
+--52 rows selected. 
+--3. Modificați instrucțiunea de la exercițiul anterior astfel încât pe coloana department_id valorile NULL provenite din baza de date să fie înlocuite cu eticheta descriptivă "Fara Departament".
+SELECT 
+    NVL(DECODE(GROUPING(department_id), 1, 'Toate departamentele', department_id), 'Fara Departament') AS department_id,
+    DECODE(GROUPING(job_id), 1, 'Toate joburile', job_id) AS job_id,
+    COUNT(*) AS numar_angajati,
+    SUM(salary + NVL(commission_pct * salary, 0)) AS suma_salariilor,
+    GROUPING_ID(department_id, job_id) AS nivel_agregare
+FROM employees
+GROUP BY CUBE(department_id, job_id)
+ORDER BY nivel_agregare;
+--52 rows selected. 
+
+--4. Afișați totalul salariilor, bonificația în funcție de comision și totalul salariilor ce include și bonificația, pentru:
+-- luna și an
+-- trimestru
+-- luna
+-- an
+-- totalul general
+-- În rezultat, afișați nivelul de agregare și ordonați după acesta.
+SELECT 
+    TO_CHAR(hire_date, 'MM-YYYY') AS Luna_An,
+    TO_CHAR(hire_date, 'Q') AS Trimestru, 
+    TO_CHAR(hire_date, 'MM') AS Luna,
+    TO_CHAR(hire_date, 'YYYY') AS An, 
+       SUM(salary) AS Total_Salariu, 
+       SUM(salary * NVL(commission_pct, 0)) AS Bonificatie,
+       SUM(salary+ salary * NVL(commission_pct, 0)) AS Salariu_Total,
+       GROUPING_ID(TO_CHAR(hire_date, 'YYYY'), TO_CHAR(hire_date, 'Q'), TO_CHAR(hire_date, 'MM')) AS GROUP_LEVEL
+FROM Employees
+GROUP BY GROUPING SETS(TO_CHAR(hire_date, 'MM-YYYY'), TO_CHAR(hire_date, 'Q'), TO_CHAR(hire_date, 'MM'),TO_CHAR(hire_date, 'YYYY'),())
+ORDER BY GROUP_LEVEL;
+
+--78 rows selected.
+
+--5.Afișați pe baza exercițiului anterior doar acele înregistrări a căror bonificații pe trimestru depășesc 5000. Scrieți rezolvarea utilizând clauza WITH.
+WITH Bonificatii_Trimestru AS (
+SELECT 
+TO_CHAR(hire_date, 'MM-YYYY') AS Luna_An,
+TO_CHAR(hire_date, 'YYYY') AS An, 
+TO_CHAR(hire_date, 'Q') AS Trimestru, 
+TO_CHAR(hire_date, 'MM') AS Luna,
+SUM(salary * NVL(commission_pct, 0)) AS Bonificatie
+FROM Employees
+GROUP BY GROUPING SETS(
+TO_CHAR(hire_date, 'MM-YYYY'), 
+TO_CHAR(hire_date, 'Q'), 
+TO_CHAR(hire_date, 'MM'),
+TO_CHAR(hire_date, 'YYYY'),())
+)
+SELECT *
+FROM Bonificatii_Trimestru
+WHERE Bonificatie > 5000 AND Trimestru IS NOT NULL;
+
+--19 rows selected.
+
+-- 6.Pentru angajații din departamentele 30 și 80 afișați salariile și bonificațiile pentru an, trimestru și lună, luând în considerare toate combinațiile posibile.
+SELECT 
+    TO_CHAR(hire_date, 'YYYY') AS An, 
+    TO_CHAR(hire_date, 'Q') AS Trimestru, 
+    TO_CHAR(hire_date, 'MM') AS Luna,
+       SUM(salary) AS Total_Salariu, 
+       SUM(salary * NVL(commission_pct, 0)) AS Bonificatie,
+       SUM(salary+ salary * NVL(commission_pct, 0)) AS Salariu_Total,
+       GROUPING_ID(TO_CHAR(hire_date, 'YYYY'), TO_CHAR(hire_date, 'Q'), TO_CHAR(hire_date, 'MM')) AS GROUP_LEVEL
+FROM Employees
+WHERE department_id IN (30, 80)
+GROUP BY CUBE(TO_CHAR(hire_date, 'Q'), TO_CHAR(hire_date, 'MM'),TO_CHAR(hire_date, 'YYYY'))
+ORDER BY GROUP_LEVEL;
+--49 rows selected.
+
+-- 7. Generati un raport complet cu numele departmentului, numele jobului și media salariilor : pentru fiecare departament și fiecare tip de job, pentru fiecare departament, indiferent de job, la nivel de job, indiferent de departament.
+SELECT 
+    d.department_name AS department_name,
+    j.job_title AS job_title,
+    AVG(e.salary) AS medie_salariu
+FROM employees e
+LEFT JOIN departments d ON e.department_id = d.department_id
+LEFT JOIN jobs j ON e.job_id = j.job_id
+GROUP BY CUBE(d.department_name, j.job_title)
+ORDER BY 1, 2;
+--52 rows selected.
+
+
+--- Partea --  SH --- 
+
+-- 1. Generați un raport complet cu totalul vânzărilor: 
+ --pentru fiecare an și lună, 
+ --pentru fiecare an,
+ --pentru fiecare lună, totalul general. 
+ --Ordonați după nivelul de agregare descendent și după totaluri descendent.
+SELECT 
+    calendar_year_id AS year, 
+    calendar_month_number AS month, 
+    SUM(amount_sold) AS total_sales
+FROM SALES
+JOIN TIMES ON SALES.time_id = TIMES.time_id
+GROUP BY ROLLUP (calendar_year_id, calendar_month_number)
+ORDER BY GROUPING(calendar_year_id) ASC, GROUPING(calendar_month_number) ASC, total_sales DESC;
+
+
+-- Exercițiul I
+-- 1. Scrieți o interogare care să întoarcă ierarhia (top-down) din departamentul condus de 'Kochhar'. Indicați nivelul din ierarhie.
+SELECT employee_id, last_name, manager_id, LEVEL
+FROM employees
+START WITH last_name = 'Kochhar'
+CONNECT BY PRIOR employee_id = manager_id;
+
+-- 2. Scrieți o interogare care să indice ierarhia managerilor (bottom-up) pentru angajatul 'Kochhar'. Indicați nivelul din ierarhie.
+SELECT employee_id, last_name, manager_id, LEVEL
+FROM employees
+START WITH last_name = 'Kochhar'
+CONNECT BY PRIOR manager_id = employee_id;
+
+-- 3. Pe baza rezultatelor de la exercițiile 1 și 2 relizați ierarhia grafică cu numele de familie a angajaților și managerilor ce fac parte din ierarhia angajatului ‘Kochhar’;
+SELECT last_name, LEVEL
+FROM employees
+START WITH last_name = 'Kochhar'
+CONNECT BY PRIOR employee_id = manager_id;
+
+-- 4. Scrieți o interogare care să realizeze ierarhia din firmă, începând cu managerul general și excluzând toți angajații care ocupă poziția funcționar.
+SELECT employee_id, last_name, job_id, manager_id, LEVEL
+FROM employees
+WHERE job_id NOT LIKE '%CLERK'
+START WITH manager_id IS NULL
+CONNECT BY PRIOR employee_id = manager_id;
+
+-- 5. Scrieți o interogare care să întoarcă un rezultat de forma: Last_name First_name se află în ierarhie pe nivelul Level pentru toți angajații.
+SELECT last_name, first_name, LEVEL
+FROM employees
+CONNECT BY PRIOR employee_id = manager_id;
+
+-- 6. Executați următoarea interogare și analizați răspunsul și spuneți ce credeți că reprezintă:
+SELECT LPAD(last_name, LENGTH(last_name)+ Level*2-2,'_'), LEVEL as Nivel
+FROM employees
+START WITH last_name= 'Kochhar'
+CONNECT BY PRIOR employee_id = manager_id;
+
+/*
+Raspuns: 
+Ce face această interogare:
+Creează o structură vizuală ierarhică utilizând funcția LPAD:
+last_name: Numele de familie al angajatului
+LENGTH(last_name): Lungimea numelui de familie
+Level*2-2: Numărul de liniuțe de subliniere care trebuie adăugate pentru fiecare nivel ierarhic
+'_': Utilizarea underscore-ului ca caracter de umplere
+Rezultat:
+Kochhar va începe de sus (nivelul 1)
+Numele angajatului la fiecare nivel inferior va fi indentat cu mai multe liniuțe de subliniere () în funcție de nivelul său
+LEVEL ca Nivel pentru a afișa nivelul fiecărui rând
+Exemplul de ieșire va arăta astfel:
+Kochhar	    1
+__Greenberg	2
+____Faviet	3
+____Chen	3
+____Sciarra	3
+____Urman	3
+____Popp	3
+__Whalen	2
+__Mavris	2
+__Baer	    2
+__Higgins	2
+____Gietz	3
+
+Translated with DeepL.com (free version)
+*/
+
+
+-- Exercițiul II
+
+-- 1. Creați tabelele nn_sal_history, nn_mgr_history și nn_special_sal, ca și COPII ale tabelelor originale (sal_history, mgr_history și special_sal), unde nn va fi înlocuit cu identificativul dumneavoastră.
+CREATE TABLE AM_sal_history AS
+(SELECT * FROM sal_history WHERE 1=0);
+
+CREATE TABLE AM_mgr_history AS
+(SELECT * FROM mgr_history WHERE 1=0);
+
+CREATE TABLE AM_special_sal AS
+(SELECT * FROM special_sal WHERE 1=0);
+
+-- 2. Modificați exemplele din laborator care implică aceste tabele și rulați-le. Verificați rezultatul.
+--Inserare neconditionala INSERT ALL
+
+INSERT ALL
+INTO AM_sal_history VALUES(empid, hiredate, sal)
+INTO AM_mgr_history VALUES (empid, mgr, sal)
+SELECT employee_id empid, hire_date hiredate, salary sal, manager_id mgr
+FROM employees
+WHERE employee_id>200;
+
+
+
+-- Inserari conditionale INSERT ALL
+INSERT ALL
+WHEN Sal>10000 THEN
+INTO AM_sal_history VALUES(empid, hiredate, sal)
+WHEN MGR > 200 THEN
+INTO AM_mgr_history VALUES(empid, mgr, sal)
+SELECT employee_id empid, hire_date hiredate, salary sal, manager_id mgr
+FROM employees
+WHERE employee_id>200;
+
+
+CREATE TABLE AM_hiredate_history_00 AS
+(SELECT department_id AS deptid, hire_date AS hiredate FROM EMPLOYEES WHERE 1=0);
+
+CREATE TABLE AM_hiredate_history_99 AS
+(SELECT department_id AS deptid, hire_date AS hiredate FROM EMPLOYEES WHERE 1=0);
+
+CREATE TABLE AM_hiredate_history AS
+(SELECT department_id AS deptid, hire_date AS hiredate FROM EMPLOYEES WHERE 1=0);
+-- Inserari conditionale INSERT FIRST
+INSERT FIRST
+WHEN SAL>20000 THEN
+INTO AM_special_sal VALUES(deptid, sal)
+WHEN HIREDATE like ('%00%') THEN
+INTO AM_hiredate_history_00 VALUES (deptid, hiredate)
+WHEN HIREDATE like ('%99%') THEN
+INTO AM_hiredate_history_99 VALUES (deptid, hiredate)
+ELSE
+INTO AM_hiredate_history VALUES (deptid, hiredate)
+SELECT department_id DEPTID, SUM(salary) SAL,
+MAX(hire_date) HIREDATE
+FROM employees
+GROUP BY department_id;
+
+-- 3. Goliți tabelele precedate de identificativul dumneavoastră utilizate la exercițiul anterior.
+SELECT * FROM AM_sal_history;
+SELECT * FROM AM_mgr_history;
+SELECT * FROM AM_special_sal;
+
+DELETE FROM AM_sal_history;
+DELETE FROM AM_mgr_history;
+DELETE FROM AM_special_sal;
+
+-- 4. Scrieți o singură interogare care să regăsească detaliile legate de: identificatorul angajatului, data angajării, salariul și identificatorul managerului pentru acei angajați al căror id este mai mic de 125 și să realizeze următoarele operații:
+-- a. Dacă salariul este mai mare de 20000 se inserează detaliile despre id-ul angajatului și salariul în tabelul special_sal.
+-- b. Indiferent de salariu se inserează detalii despre id-ul angajatului, data angajării și salariu în tabelul sal_history;
+-- c. Indiferent de salariu se inserează datele referitoare la id-ul angajatului, id-ul managerului și salariul în tabelul mgr_history;
+INSERT ALL
+    WHEN sal > 20000 THEN
+        INTO AM_special_sal (empid, sal) VALUES (empid, sal)
+    INTO AM_sal_history (empid, hiredate, sal) VALUES (empid, hiredate, sal)
+    INTO AM_mgr_history (empid, mgr, sal) VALUES (empid, mgr, sal)
+SELECT employee_id AS empid, hire_date AS hiredate, salary AS sal, manager_id AS mgr
+FROM employees
+WHERE employee_id < 125;
+
+
+SELECT employee_id AS empid, hire_date AS hiredate, salary AS sal, manager_id AS mgr FROM employees WHERE employee_id < 125;
+-- 5. Scrieți o interogare care inserează în tabelele AM_Sales și AM_Shipping angajații (identificator, nume, prenume, data angajării) care lucrează în departamentele cu numele Sales, respectiv Shipping.
+CREATE TABLE AM_Sales (
+    employee_id NUMBER PRIMARY KEY,
+    first_name VARCHAR2(50),
+    last_name VARCHAR2(50),
+    hire_date DATE
+);
+
+CREATE TABLE AM_Shipping (
+    employee_id NUMBER PRIMARY KEY,
+    first_name VARCHAR2(50),
+    last_name VARCHAR2(50),
+    hire_date DATE
+);
+
+
+INSERT INTO AM_Sales (employee_id, first_name, last_name, hire_date)
+SELECT e.employee_id, e.first_name, e.last_name, e.hire_date
+FROM employees e
+WHERE e.department_id IN (SELECT department_id FROM departments WHERE department_name = 'Sales')
+AND NOT EXISTS (
+    SELECT 1 FROM AM_Sales s WHERE s.employee_id = e.employee_id
+);
+
+INSERT INTO AM_Shipping (employee_id, first_name, last_name, hire_date)
+SELECT e.employee_id, e.first_name, e.last_name, e.hire_date
+FROM employees e
+WHERE e.department_id IN (SELECT department_id FROM departments WHERE department_name = 'Shipping')
+AND NOT EXISTS (
+    SELECT 1 FROM AM_Shipping sh WHERE sh.employee_id = e.employee_id
+);
+
+SELECT * FROM AM_Sales;
+SELECT * FROM AM_Shipping;
+
+-- 6. Inserați în tabelele indicate, printr-o singură instrucțiune, următoarele informații despre angajații care nu primesc comision:
+
+CREATE TABLE AM_sal_medii (
+    last_name VARCHAR2(50),
+    first_name VARCHAR2(50),
+    job_id VARCHAR2(50)
+);
+
+CREATE TABLE AM_functionari (
+    employee_id NUMBER PRIMARY KEY,
+    last_name VARCHAR2(50),
+    first_name VARCHAR2(50),
+    salary NUMBER
+);
+INSERT ALL
+    --a. numele, prenumele, job_id – în tabelul nn_sal_medii - dacă salariul este între 4000 și 7000
+    WHEN salary BETWEEN 4000 AND 7000 THEN
+        INTO AM_sal_medii (last_name, first_name, job_id)
+        VALUES (e.last_name, e.first_name, e.job_id)
+    
+    --b. identificatorul, numele, prenumele, salariul – în tabelul nn_functionari - dacă job_id corespunde unui funcționar (se termină în CLERK)
+    WHEN job_id LIKE '%CLERK' THEN
+        INTO AM_functionari (employee_id, last_name, first_name, salary)
+        VALUES (employee_id, last_name, first_name, salary)
+
+SELECT employee_id, last_name, first_name, job_id, salary
+FROM employees
+WHERE commission_pct IS NULL;
+
+SELECT * FROM AM_sal_medii;
+SELECT * FROM AM_functionari;
+
+-- 7. După modelul din exemplul pentru instrucțiunea MERGE, creați-vă câte un tabel PROPRIU. Pe acest tabel executați instrucțiunea MERGE și verificați rezultatul.
+CREATE TABLE AM_employees (
+    employee_id NUMBER PRIMARY KEY,
+    first_name VARCHAR2(50),
+    last_name VARCHAR2(50),
+    salary NUMBER,
+    department_id NUMBER
+);
+
+MERGE INTO AM_employees m
+USING (SELECT employee_id, first_name, last_name, salary, department_id FROM employees) e
+ON (m.employee_id = e.employee_id)
+WHEN MATCHED THEN 
+    UPDATE SET m.salary = e.salary, m.department_id = e.department_id
+WHEN NOT MATCHED THEN 
+    INSERT (employee_id, first_name, last_name, salary, department_id) 
+    VALUES (e.employee_id, e.first_name, e.last_name, e.salary, e.department_id);
+
+
+SELECT * FROM AM_employees;
+
+
+
+-- 8. Afișați numele, prenumele, salariul și salariul vechi din tabelul creat la exercițiul anterior cu angajații a căror salarii au fost micșorate. Folosiți operatorul EXISTS.
+-- -- Creați un tabel nn_employees_arhiva cu următoarea structură: EMPLOYEE_ID, FIRST_NAME, LAST_NAME, EMAIL, PHONE_NUMBER, HIRE_DATE, JOB_TITLE, SALARY, COMMISSION_PCT, TOTAL_SALARY, MANAGER_FULLNAME, DEPARTMENT_NAME.
+-- -- Creați un script care rulat o dată pe săptămână să permită actualizarea informațiilor existente în tabel dar și adăugarea de informații noi pe baza datelor din DB schema HR.
+CREATE TABLE AM_employees_arhiva AS
+SELECT 
+    e.employee_id, 
+    e.first_name, 
+    e.last_name, 
+    e.email, 
+    e.phone_number, 
+    e.hire_date, 
+    e.job_id, 
+    e.salary, 
+    e.commission_pct, 
+    e.salary + NVL(e.salary * e.commission_pct, 0) AS total_salary,
+    NVL(m.first_name || ' ' || m.last_name, 'No Manager') AS manager_fullname,
+    d.department_name
+FROM employees e
+LEFT JOIN employees m ON e.manager_id = m.employee_id
+LEFT JOIN departments d ON e.department_id = d.department_id;

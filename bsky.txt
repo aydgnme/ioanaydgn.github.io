@@ -1,0 +1,3 @@
+https://aydgn.me/.well-known/atproto-did
+
+did:plc:7udrvwrlfaijuh4kd4d5xpqx

@@ -1,63 +1,339 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ro">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>aydgn.me</title>
-    <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Portofoliu Mert Aydogan</title>
+  <link rel="stylesheet" href="styles.css"/>
 </head>
 <body>
-    <header>
-        <nav>
-            <a class="underline" href="/cv.pdf">about</a>
-        </nav>
-        <h1>
-            <a href="./a.pdf">
-                0x22:$<span class="cursor">█</span>
-            </a>
-        </h1>
-    </header>
-    <body>
-        <div class="card">
-            <img class="u-photo centered" width="250" src="me.png" alt="Mert I. Aydogan">
-            <div class="animate-text">
-                <!-- AnimateText içeriği buraya gelecek -->
-            </div>
-            <ul>
-                <li>
-                    <a class="u-url" rel="me" href="https://github.com/ioanaydgn">Github</a>
-                </li>
-                <li>
-                    <a class="u-url" rel="me" href="https://gitlab.com/ioan34">Gitlab</a>
-                </li>
-                <li>
-                    <a class="u-email" rel="me" href="mailto:mertaydogn0+site@gmail.com">Mail</a>
-                </li>
-                <li>
-                    <a class="u-key" rel="me" href="/1.pdf">8B80 E673 9B08 79B0 0A4A EB7E 0941 09D0 83C8 8FF7</a>
-                </li>
-            </ul>
-            <div align="center">
-                <a href="https://www.linkedin.com/in/mert-aydogan-b359311b9/">
-                    <button>
-                        <span></span> linkedin <span></span>
-                        <span></span>
-                        <span></span>
-                    </button>
-                </a>
-            </div>
+  <div class="container">
+    <div class="sidebar">
+      <!-- Xcode Navigator Header -->
+      <div class="navigator-header">
+        <div class="navigator-title">
+          <span class="navigator-icon">📁</span>
+          <span class="title-text">MertAydogan Portfolio</span>
         </div>
-        <footer>
-            &copy; Copyright 2019 - <span id="currentYear"></span> - ioanaydgn.
-            <div style="margin-top: 20px;"><br/></div>
-            <a href="/pdb.txt">←</a>
-            &nbsp;-&nbsp;
-            <a href="/">→</a>
-        </footer>
-    
-        <script>
-            // JavaScript to dynamically update the year
-            document.getElementById('currentYear').textContent = new Date().getFullYear();
-        </script>
-    </body>
-    </html>
+        <div class="navigator-controls">
+          <span class="control-btn">⚙️</span>
+          <span class="control-btn"><a href="./cv.pdf">🔍</a></span>
+        </div>
+      </div>
+
+      <!-- File Tree Structure -->
+      <div class="file-navigator">
+        <!-- Profile "Folder" -->
+        <div class="folder-item expanded">
+          <div class="folder-header">
+            <span class="folder-icon">📂</span>
+            <span class="folder-name">Profile</span>
+          </div>
+          <div class="folder-content">
+            <div class="file-item profile-file">
+              <span class="file-icon">👨‍💻</span>
+              <div class="file-info">
+                <span class="file-name">Mert Aydogan</span>
+                <span class="file-subtitle">Junior iOS Developer</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Contact "Folder" -->
+        <div class="folder-item expanded">
+          <div class="folder-header">
+            <span class="folder-icon">�</span>
+            <span class="folder-name">Contact</span>
+          </div>
+          <div class="folder-content">
+            <div class="file-item">
+              <span class="file-icon">📱</span>
+              <span class="file-name">+40 727 179 361</span>
+            </div>
+            <div class="file-item">
+              <span class="file-icon">📧</span>
+              <span class="file-name">aydgnme@icloud.com</span>
+            </div>
+            <div class="file-item">
+              <span class="file-icon">📍</span>
+              <span class="file-name">Botoșani, România</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Skills "Folder" -->
+        <div class="folder-item expanded">
+          <div class="folder-header">
+            <span class="folder-icon">📂</span>
+            <span class="folder-name">Skills</span>
+          </div>
+          <div class="folder-content">
+            <div class="subfolder-item">
+              <div class="subfolder-header">
+                <span class="subfolder-icon">📁</span>
+                <span class="subfolder-name">iOS Development</span>
+              </div>
+              <div class="subfolder-content">
+                <div class="file-item skill-file swift">
+                  <span class="file-icon">🟠</span>
+                  <span class="file-name">Swift</span>
+                </div>
+                <div class="file-item skill-file swiftui">
+                  <span class="file-icon">🔵</span>
+                  <span class="file-name">SwiftUI</span>
+                </div>
+                <div class="file-item skill-file uikit">
+                  <span class="file-icon">🟣</span>
+                  <span class="file-name">UIKit</span>
+                </div>
+                <div class="file-item skill-file xcode">
+                  <span class="file-icon">🛠️</span>
+                  <span class="file-name">Xcode</span>
+                </div>
+                <div class="file-item skill-file mvvm">
+                  <span class="file-icon">🏗️</span>
+                  <span class="file-name">MVVM</span>
+                </div>
+              </div>
+            </div>
+            <div class="subfolder-item">
+              <div class="subfolder-header">
+                <span class="subfolder-icon">📁</span>
+                <span class="subfolder-name">Programming</span>
+              </div>
+              <div class="subfolder-content">
+                <div class="file-item skill-file java">
+                  <span class="file-icon">☕</span>
+                  <span class="file-name">Java</span>
+                </div>
+                <div class="file-item skill-file python">
+                  <span class="file-icon">🐍</span>
+                  <span class="file-name">Python</span>
+                </div>
+                <div class="file-item skill-file js">
+                  <span class="file-icon">🟡</span>
+                  <span class="file-name">JavaScript</span>
+                </div>
+              </div>
+            </div>
+            <div class="subfolder-item">
+              <div class="subfolder-header">
+                <span class="subfolder-icon">📁</span>
+                <span class="subfolder-name">Web & Mobile</span>
+              </div>
+              <div class="subfolder-content">
+                <div class="file-item skill-file react-native">
+                  <span class="file-icon">⚛️</span>
+                  <span class="file-name">React Native</span>
+                </div>
+                <div class="file-item skill-file web">
+                  <span class="file-icon">🌐</span>
+                  <span class="file-name">HTML/CSS</span>
+                </div>
+                <div class="file-item skill-file react">
+                  <span class="file-icon">⚛️</span>
+                  <span class="file-name">React.js</span>
+                </div>
+                <div class="file-item skill-file django">
+                  <span class="file-icon">🎸</span>
+                  <span class="file-name">Django</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Languages "Folder" -->
+        <div class="folder-item expanded">
+          <div class="folder-header">
+            <span class="folder-icon">📂</span>
+            <span class="folder-name">Languages</span>
+          </div>
+          <div class="folder-content">
+            <div class="file-item language-file">
+              <span class="file-icon">🇹🇷</span>
+              <span class="file-name">Turcă</span>
+              <span class="file-badge native">Native</span>
+            </div>
+            <div class="file-item language-file">
+              <span class="file-icon">🇷🇴</span>
+              <span class="file-name">Română</span>
+              <span class="file-badge proficient">C1</span>
+            </div>
+            <div class="file-item language-file">
+              <span class="file-icon">🇬🇧</span>
+              <span class="file-name">Engleză</span>
+              <span class="file-badge advanced">Advanced</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Links "Folder" -->
+        <div class="folder-item expanded">
+          <div class="folder-header">
+            <span class="folder-icon">�</span>
+            <span class="folder-name">Links</span>
+          </div>
+          <div class="folder-content">
+            <a href="https://github.com/aydgnme" target="_blank" class="file-item link-file">
+              <span class="file-icon">🐙</span>
+              <span class="file-name">GitHub</span>
+              <span class="external-link">↗️</span>
+            </a>
+            <a href="mailto:aydgnme@icloud.com" class="file-item link-file">
+              <span class="file-icon">✉️</span>
+              <span class="file-name">Email</span>
+              <span class="external-link">↗️</span>
+            </a>
+            <a href="https://linkedin.com/in/aydgnme" target="_blank" class="file-item link-file">
+              <span class="file-icon">💼</span>
+              <span class="file-name">LinkedIn</span>
+              <span class="external-link">↗️</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="main">
+      <pre>
+<code class="xcode-theme"><span class="comment">//  CV.swift</span>
+<span class="comment">//  MertAydoganPortofoliu</span>
+<span class="comment">//</span>
+<span class="comment">//  Creat de Mert Aydogan pe 1 Iulie 2025.</span>
+<span class="comment">//</span>
+
+<span class="keyword">import</span> <span class="type">Foundation</span>
+
+<span class="keyword">struct</span> <span class="type">Profil</span> {
+    <span class="keyword">let</span> <span class="property">nume</span>: <span class="type">String</span> = <span class="string">"Mert Aydogan"</span>
+    <span class="keyword">let</span> <span class="property">rol</span>: <span class="type">String</span> = <span class="string">"Junior iOS Developer"</span>
+    <span class="keyword">let</span> <span class="property">descriere</span>: <span class="type">String</span> = <span class="string">"""
+    Dezvoltator iOS pasionat, cu bază solidă în Swift, Java și tehnologii web.
+    Experiență în crearea de aplicații mobile și web intuitive.
+    Adaptabil, orientat spre rezolvarea provocărilor reale.
+    """</span>
+}
+
+<span class="keyword">struct</span> <span class="type">Experienta</span> {
+    <span class="keyword">let</span> <span class="property">windMedyaGraphic</span>: <span class="type">String</span> = <span class="string">"Graphic Artist, Wind Medya, Istanbul"</span>
+    <span class="keyword">let</span> <span class="property">perioada1</span>: <span class="type">String</span> = <span class="string">"Apr 2021 - Mai 2021"</span>
+
+    <span class="keyword">let</span> <span class="property">tabYazilim</span>: <span class="type">String</span> = <span class="string">"Web Developer, TAB Yazilim, Istanbul"</span>
+    <span class="keyword">let</span> <span class="property">perioada2</span>: <span class="type">String</span> = <span class="string">"Iun 2019 - Oct 2020"</span>
+
+    <span class="keyword">let</span> <span class="property">windMedyaWeb</span>: <span class="type">String</span> = <span class="string">"Web Programmer, Wind Medya, Istanbul"</span>
+    <span class="keyword">let</span> <span class="property">perioada3</span>: <span class="type">String</span> = <span class="string">"Sep 2018 - Iun 2019"</span>
+}
+
+<span class="keyword">struct</span> <span class="type">Educatie</span> {
+    <span class="keyword">let</span> <span class="property">universitate</span>: <span class="type">String</span> = <span class="string">"Universitatea Ștefan cel Mare din Suceava"</span>
+    <span class="keyword">let</span> <span class="property">program</span>: <span class="type">String</span> = <span class="string">"Licență, Informatica"</span>
+    <span class="keyword">let</span> <span class="property">finalizare</span>: <span class="type">String</span> = <span class="string">"Așteptat 2025"</span>
+
+    <span class="keyword">let</span> <span class="property">certificatLimba</span>: <span class="type">String</span> = <span class="string">"Certificat Limba Română (C1) - 2021"</span>
+}
+
+<span class="keyword">struct</span> <span class="type">Proiecte</span> {
+    <span class="keyword">let</span> <span class="property">proiecte</span>: [<span class="type">String</span>] = [
+        <span class="string">"Login Screen App — Swift"</span>,
+        <span class="string">"Tip Calculator App — Swift"</span>,
+        <span class="string">"Weather App — Swift, UIKit"</span>,
+        <span class="string">"To-Do List App — Swift, SwiftUI"</span>,
+        <span class="string">"Timer On Road — Swift, UIKit"</span>,
+        <span class="string">"React Native Jobs App — React Native"</span>,
+        <span class="string">"Rent-a-Car Management System — Java"</span>,
+
+    ]
+}
+</code>
+      </pre>
+    </div>
+  </div>
+
+  <script>
+    // Mobile folder toggle functionality
+    document.addEventListener('DOMContentLoaded', function() {
+      // Check if we're on mobile
+      function isMobile() {
+        return window.innerWidth <= 768;
+      }
+
+      // Toggle folder/subfolder expansion
+      function toggleFolder(element, contentSelector) {
+        const content = element.querySelector(contentSelector);
+        const isExpanded = element.classList.contains('expanded');
+        
+        if (isExpanded) {
+          element.classList.remove('expanded');
+          if (content) content.style.display = 'none';
+        } else {
+          element.classList.add('expanded');
+          if (content) content.style.display = 'block';
+        }
+      }
+
+      // Add click handlers for folder headers
+      document.querySelectorAll('.folder-header').forEach(header => {
+        header.addEventListener('click', function(e) {
+          e.stopPropagation();
+          if (isMobile()) {
+            toggleFolder(this.parentElement, '.folder-content');
+          }
+        });
+      });
+
+      // Add click handlers for subfolder headers
+      document.querySelectorAll('.subfolder-header').forEach(header => {
+        header.addEventListener('click', function(e) {
+          e.stopPropagation();
+          if (isMobile()) {
+            toggleFolder(this.parentElement, '.subfolder-content');
+          }
+        });
+      });
+
+      // Initialize mobile state
+      function initializeMobileState() {
+        if (isMobile()) {
+          // Collapse all folders except Profile
+          document.querySelectorAll('.folder-item').forEach((folder, index) => {
+            if (index === 0) { // Keep Profile expanded
+              folder.classList.add('expanded');
+            } else {
+              folder.classList.remove('expanded');
+              const content = folder.querySelector('.folder-content');
+              if (content) content.style.display = 'none';
+            }
+          });
+
+          // Collapse all subfolders
+          document.querySelectorAll('.subfolder-item').forEach(subfolder => {
+            subfolder.classList.remove('expanded');
+            const content = subfolder.querySelector('.subfolder-content');
+            if (content) content.style.display = 'none';
+          });
+        } else {
+          // Desktop: expand everything
+          document.querySelectorAll('.folder-item, .subfolder-item').forEach(item => {
+            item.classList.add('expanded');
+            const content = item.querySelector('.folder-content, .subfolder-content');
+            if (content) content.style.display = 'block';
+          });
+        }
+      }
+
+      // Initialize on load
+      initializeMobileState();
+
+      // Re-initialize on window resize
+      let resizeTimeout;
+      window.addEventListener('resize', function() {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(initializeMobileState, 250);
+      });
+    });
+  </script>
+</body>
+</html>
